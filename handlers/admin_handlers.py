@@ -1,4 +1,5 @@
 from aiogram import Router, F, Bot
+from aiogram.exceptions import TelegramBadRequest
 from aiogram.types import Message, CallbackQuery
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
@@ -44,7 +45,10 @@ async def callback_refresh(callback: CallbackQuery):
         f"- Одобрено: {approved}\n\n"
         "Выберите действие:"
     )
-    await callback.message.edit_text(msg, reply_markup=admin_panel_keyboard())
+    try:
+        await callback.message.edit_text(msg, reply_markup=admin_panel_keyboard())
+    except TelegramBadRequest:
+        await callback.answer("Данные не изменились")
 
 @router.callback_query(F.data.startswith("verify_"))
 async def callback_verify(callback: CallbackQuery, bot: Bot):
